@@ -1,0 +1,41 @@
+// Sandu Stefania-Cristina 324CA
+
+Prima parte a proiectului contine pachetele input si output pentru citirea si afisarea datelor, inclusiv clasele cu care se lucreaza, un pachet utils  si clasele Main si Test.
+
+* pachetul input prezinta o interfata comuna EntityInput pentru consumer si distributor
+
+* input.ConsumerInput
+	* aceasta clasa implementeaza interfata Consumer pentru ca este specificat in enuntul temei ca acestia pot fi industriali sau casnici, ceea ce poate ajuta la viitoarea etapa pentru utilizarea design pattern-ului factory, pentru tratarea acestui caz
+	* sunt adaugate campuri pentru a completa informatiile despre un consumator, cum ar fi daca acesta are penalizare, contractul si distribuitorul actual, dar si posibilul contract si distribuitor nou, pentru cazul in care acesta doreste sa-l schimbe
+	* metoda totalBudget calculeaza bugetul lunar al unui consumator
+
+* input.DistributorInput
+	* un distributor retine, pe langa campurile din input, si numarul de clienti, pretul contractului actual pe care il ofera calculat in fiecare luna, o lista cu consumatorii care au contract cu acesta, o lista de contracte ale consumatorilor si o lista cu consumatorii care au penalizare
+
+* pachetul utils prezinta clasele Contract, care serveste drept clasa de input si output, continand exact id-ul unui consumator, pretul contractului si luunile ramse de plata, si EnergySystem, care serveste ca un intermediar intre input si output, metodele utilizate in simulare (main) fiind implementate aici
+
+* utils.EnergySystems este o clasa de tip Singleton, ce se comporta ca o baza de date pentru un sistem energetic, accesul la ea fiind realizat prin metoda statica getInstance
+	* contractPrice - calzuleaza, folosind formulele, pretul ofertei unui distribuitor
+	* chooseContract - un consumator poate sa isi aleaga contractul dat de distribuitor daca acesta nu are unul sau are si se afla in ultima luna de plata; in cazul in care are un contract deja, se sterge contractul din lista distribuitorului si consumatorul din lista de consumatori a distribuitorului si se scade nr clientilor
+		*  daca un consumator are penalizare, atunci contractul creat si distribuitorul sunt setati ca fiind noul contract si noul distribuitor
+		* daca nu are penalizare, doar trebuie sa-si reseteze actualul contract cu cel creat
+
+	* payDebt - verifica daca un consumator poate plati rata lunara astfel:
+		* daca are penalizare, se verifica daca poate plati luna trecuta, penalizarea si luna actuala si se actualizeaza contractul si distribuitorul, iar daca nu se declara bankrupt
+
+	* payCostsDistributor - calculeaza costurile pe care trebuie sa le plateasca un distribuitor si recalculeaza bugetul acestuia, iar daca la sfarsit se hotaraste daca acesta devine bankrupt sau nu
+
+	* metoda setUpdates - se foloseste pentru update-urile d ela inceputul lunilor
+
+	* removeContract - seteaza actualul contract, actualul distribuitor in cazul in care distribuitorul devine bankrupt si penalizarea este retraza, daca acesta avea una
+
+* pachetul output contine clasele generate prin fcatory, care implemnteaza aceeasi interfata, EntityOutput
+
+* Main
+	* se parseaza fisierele de input si apoi sunt copiate datele in liste de consumatori, distribuitori si monthly updates.
+	* simularea se desfasoara pentru fiecare din cele numberOfTurns luni cu ajutorul clasei EnergySystem din pachetul utils, unde sunt implementate metode ajutatoare, astfel:
+	* pentru lunile implicite se actualizeaza costurile si se adauga noi clienti daca este cazul
+	* pentru fiecare distribuitor, daca acesta nu este bankrupt, se calculeaza pretul actual al unui contract, apoi se filtreaza distribuitorul cu oferta minima dintre acestia
+	* pentru fiecare consumator, se alege un contract, apoi acestia platesc
+	* se aplica costurile pentru fiecare distribuitor si se recalculeaza bugetele
+	* la sfarsit se genereaza clase de output care sa corespunda cerintelor pentru entitati utilizand design pattern-ul factory si se scrie in fisiere
